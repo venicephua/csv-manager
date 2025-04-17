@@ -11,7 +11,11 @@ export interface CsvFile {
 export interface CsvRow {
     id?: number;
     file_id: number;
-    row_data: Record<string, any>;
+    col_postId: number;
+    col_id: number;
+    col_name: string;
+    col_email: string;
+    col_body: string;
     row_index: number;
 }
 
@@ -35,8 +39,8 @@ export default class CsvModel {
 
             const insertPromises = rows.map(row => {
                 return client.query(
-                  'INSERT INTO csv_data (file_id, row_data, row_index) VALUES ($1, $2, $3)',
-                  [row.file_id, row.row_data, row.row_index]
+                  'INSERT INTO posts (file_id, col_postId, col_id, col_name, col_email, col_body, row_index) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                  [row.file_id, row.col_postId, row.id, row.col_name, row.col_email, row.col_body, row.row_index]
                 );
             });
 
@@ -75,12 +79,12 @@ export default class CsvModel {
         const offset = (page - 1) * limit;
 
         let queryParams: (number | string)[] = [fileId, limit, offset];
-        let query = 'SELECT * FROM csv_data WHERE file_id = $1';
-        let countQuery = 'SELECT COUNT(*) FROM csv_data WHERE file_id = $1';
+        let query = 'SELECT * FROM posts WHERE file_id = $1';
+        let countQuery = 'SELECT COUNT(*) FROM posts WHERE file_id = $1';
 
         if (searchTerm && searchTerm.trim() !== '') {
-            query += " AND row_data::text ILIKE $4";
-            countQuery += " AND row_data::text ILIKE $2";
+            query += " AND (col_name ILIKE $4 OR col_email ILIKE $4 OR col_body ILIKE $4)";
+            countQuery += " AND (col_name ILIKE $2 OR col_email ILIKE $2 OR col_body ILIKE $2)";
             queryParams.push(`%${searchTerm}%`);
         }
 
@@ -111,7 +115,8 @@ export default class CsvModel {
         return result.rows[0].columns;
     }
 
-    static async deleteCsvFile(fileId: number): Promise<void> {
+    static async deleteCsvFile(fileId: number): Promise<boolean> {
         const result = await pool.query('DELETE FROM csv_files WHERE id = $1', [fileId]);
+        return (result.rowCount || 0) > 0;
     }
 } 

@@ -8,21 +8,21 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (_req, _file, cb) => {
         cb(null, uploadsDir);
     },
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const fileExt = path.extname(file.originalname);
         cb(null, file.fieldname + '-' + uniqueSuffix + fileExt);
     }
 });
 
-const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    if (file.mimetype === 'text/csv'|| file.originalname.endsWith('.csv')) {
+const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    if (file.mimetype === 'text/csv'|| file.originalname.toLowerCase().endsWith('.csv')) {
         cb(null, true);
     } else {
-        cb(new Error('Only CSV files are allowed.'));
+        cb(null, false);
     }
 };
 

@@ -29,7 +29,11 @@ export default class CsvController {
 
       const csvRows: CsvRow[] = rows.map((row, index) => ({
         file_id: fileId,
-        row_data: row,
+        col_postId: row.postId,
+        col_id: row.id,
+        col_name: row.name,
+        col_email: row.email,
+        col_body: row.body,
         row_index: index,
       }));
 
@@ -95,15 +99,49 @@ export default class CsvController {
     }
   }
 
+  // static async deleteCsvFile(req: Request, res: Response): Promise<void> {
+  //   try {
+  //     const fileId = parseInt(req.params.fileId);
+  //     // if (fileId === 1) {
+  //     //   res.json({ message: 'CSV file deleted successfully' });
+  //     //   return;
+  //     // }
+
+  //     await CsvModel.deleteCsvFile(fileId);
+
+  //     // // console.log('Deleting file ID:', fileId); // Debug log
+  //     // process.stdout.write(`Deleting file ID: ${fileId}\n`);
+  //     // const wasDeleted = await CsvModel.deleteCsvFile(fileId);
+  //     // // console.log('Was deleted:', wasDeleted); // Debug log
+  //     // process.stdout.write(`Was deleted: ${wasDeleted}\n`);
+        
+  //     // if (!wasDeleted) {
+  //     //     res.status(404).json({ error: 'CSV file not found' });
+  //     //     return;
+  //     // }
+
+  //     res.json({ message: 'CSV file deleted successfully' });
+  //   } catch (err) {
+  //     CsvController.handleServerError(res, 'deleting CSV file', err);
+  //   }
+  // }
+
   static async deleteCsvFile(req: Request, res: Response): Promise<void> {
     try {
       const fileId = parseInt(req.params.fileId);
-      await CsvModel.deleteCsvFile(fileId);
-      res.json({ message: 'CSV file deleted successfully' });
+      const success = await CsvModel.deleteCsvFile(fileId);
+      
+      if (success) {
+        res.status(200).json({ message: 'CSV file deleted successfully' });
+        return;
+      } else {
+        res.status(404).json({ error: 'CSV file not found' });
+        return;
+      }
     } catch (err) {
       CsvController.handleServerError(res, 'deleting CSV file', err);
     }
-  }
+  };
 
   private static getPagination(req: Request): { page: number; limit: number } {
     return {

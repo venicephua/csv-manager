@@ -5,21 +5,21 @@ dotenv.config();
 
 // Create a connection pool
 const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
+  user: process.env.DB_USER || 'venice',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'csv_manager',
+  database: process.env.DB_NAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   port: parseInt(process.env.DB_PORT || '5432'),
 });
 
 // Test the connection
-pool.query('SELECT NOW()', (err) => {
-  if (err) {
-    console.error('Database connection error:', err.stack);
-  } else {
-    console.log('Database connected successfully');
-  }
-});
+// pool.query('SELECT NOW()', (err) => {
+//   if (err) {
+//     console.error('Database connection error:', err.stack);
+//   } else {
+//     console.log('Database connected successfully');
+//   }
+// });
 
 // Function to initialize database tables
 export const initDb = async (): Promise<void> => {
@@ -32,24 +32,32 @@ export const initDb = async (): Promise<void> => {
         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         row_count INTEGER NOT NULL,
         columns JSONB NOT NULL
-      )u
+      )
     `);
 
-    // Create table for the actual CSV data
-    // We'll store it as a JSONB column to handle dynamic fields
+    // Create table for the actual CSV data (posts)
+    // Store it in each column of the csv file
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS csv_data (
+      CREATE TABLE IF NOT EXISTS posts (
         id SERIAL PRIMARY KEY,
         file_id INTEGER REFERENCES csv_files(id) ON DELETE CASCADE,
-        row_data JSONB NOT NULL,
+        col_postId INTEGER NOT NULL,
+        col_id INTEGER NOT NULL,
+        col_name TEXT NOT NULL, 
+        col_email TEXT NOT NULL,
+        col_body TEXT NOT NULL,
         row_index INTEGER NOT NULL
       )
     `);
 
     // Create index for faster searching
     await pool.query(`
-      CREATE INDEX IF NOT EXISTS csv_data_file_id_idx ON csv_data(file_id);
-      CREATE INDEX IF NOT EXISTS csv_data_row_data_idx ON csv_data USING GIN(row_data);
+      CREATE INDEX IF NOT EXISTS posts_file_id_idx ON posts(file_id);
+      CREATE INDEX IF NOT EXISTS posts_col_postId_idx ON posts(col_postId);
+      CREATE INDEX IF NOT EXISTS posts_col_id_idx ON posts(col_id);
+      CREATE INDEX IF NOT EXISTS posts_col_name_idx ON posts(col_name);
+      CREATE INDEX IF NOT EXISTS posts_col_email_idx ON posts(col_email);
+      CREATE INDEX IF NOT EXISTS posts_col_body_idx ON posts(col_body);
     `);
 
     console.log('Database tables initialized');
