@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3001/api/csv"; // Make sure to update this port to match your backend
+const API_URL = "http://localhost:3001/api/csv"; 
 
 export const uploadCSV = async (
   file: File,
