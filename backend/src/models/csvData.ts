@@ -16,7 +16,6 @@ export interface CsvRow {
     col_name: string;
     col_email: string;
     col_body: string;
-    row_index: number;
 }
 
 export default class CsvModel {
@@ -27,6 +26,7 @@ export default class CsvModel {
             'INSERT INTO csv_files (filename, row_count, columns) VALUES ($1, $2, $3) RETURNING id',
             [filename, row_count, JSON.stringify(columns)]
         );
+        console.log('Data file inserted successfully into csv_files');
 
         return result.rows[0].id;
     }
@@ -39,10 +39,11 @@ export default class CsvModel {
 
             const insertPromises = rows.map(row => {
                 return client.query(
-                  'INSERT INTO posts (file_id, col_postId, col_id, col_name, col_email, col_body, row_index) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                  [row.file_id, row.col_postId, row.id, row.col_name, row.col_email, row.col_body, row.row_index]
+                  'INSERT INTO posts (file_id, col_postId, col_id, col_name, col_email, col_body) VALUES ($1, $2, $3, $4, $5, $6)',
+                  [row.file_id, row.col_postId, row.col_id, row.col_name, row.col_email, row.col_body]
                 );
             });
+            console.log('Data inserted successfully into posts');
 
             await Promise.all(insertPromises);
             await client.query('COMMIT');
@@ -63,6 +64,7 @@ export default class CsvModel {
             'SELECT * FROM csv_files ORDER BY upload_date DESC LIMIT $1 OFFSET $2',
             [limit, offset]
         );
+        console.log('Data file fetched successfully from csv_files');
 
         return {
             files: result.rows,
@@ -88,14 +90,15 @@ export default class CsvModel {
             queryParams.push(`%${searchTerm}%`);
         }
 
-        query += ' ORDER BY row_index LIMIT $2 OFFSET $3';
+        query += ' LIMIT $2 OFFSET $3';
 
-        const countParams = searchTerm ? [fileId, `%{searchTerm}%`] : [fileId];
+        const countParams = searchTerm ? [fileId, `%${searchTerm}%`] : [fileId];
         const countResult = await pool.query(countQuery, countParams);
         const total = parseInt(countResult.rows[0].count);
 
         const result = await pool.query(query, queryParams);
 
+        console.log('Data fetched successfully from posts');
         return {
             rows: result.rows,
             total
@@ -111,12 +114,15 @@ export default class CsvModel {
         if (result.rows.length === 0) {
             throw new Error('CSV file not found');
         }
+        console.log('Columns fetched successfully from data file');
 
         return result.rows[0].columns;
     }
 
     static async deleteCsvFile(fileId: number): Promise<boolean> {
         const result = await pool.query('DELETE FROM csv_files WHERE id = $1', [fileId]);
+
+        console.log('Data file deleted successfully from csv_files');
         return (result.rowCount || 0) > 0;
     }
 } 

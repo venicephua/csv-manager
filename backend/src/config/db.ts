@@ -12,15 +12,6 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432'),
 });
 
-// Test the connection
-// pool.query('SELECT NOW()', (err) => {
-//   if (err) {
-//     console.error('Database connection error:', err.stack);
-//   } else {
-//     console.log('Database connected successfully');
-//   }
-// });
-
 // Function to initialize database tables
 export const initDb = async (): Promise<void> => {
   try {
@@ -45,8 +36,7 @@ export const initDb = async (): Promise<void> => {
         col_id INTEGER NOT NULL,
         col_name TEXT NOT NULL, 
         col_email TEXT NOT NULL,
-        col_body TEXT NOT NULL,
-        row_index INTEGER NOT NULL
+        col_body TEXT NOT NULL
       )
     `);
 

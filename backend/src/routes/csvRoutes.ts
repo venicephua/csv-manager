@@ -10,6 +10,6 @@ router.get('/files', CsvController.getCsvFiles);
 
 router.get('/files/:fileId/data', CsvController.getCsvData);
 
-router.delete('files/:fileId', CsvController.deleteCsvFile);
+router.delete('/files/:fileId', CsvController.deleteCsvFile);
 
 export default router;

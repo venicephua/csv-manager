@@ -34,7 +34,6 @@ export default class CsvController {
         col_name: row.name,
         col_email: row.email,
         col_body: row.body,
-        row_index: index,
       }));
 
       await CsvModel.insertCsvRows(csvRows);
@@ -45,6 +44,9 @@ export default class CsvController {
         rowCount: rows.length,
         columns,
       });
+      console.log('Received file:', file);
+      // console.log('Parsed rows:', file);
+
     } catch (err) {
       res.status(400).json({
         error: 'Failed to parse or process CSV',
@@ -98,33 +100,6 @@ export default class CsvController {
       CsvController.handleServerError(res, 'retrieving CSV data', err);
     }
   }
-
-  // static async deleteCsvFile(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const fileId = parseInt(req.params.fileId);
-  //     // if (fileId === 1) {
-  //     //   res.json({ message: 'CSV file deleted successfully' });
-  //     //   return;
-  //     // }
-
-  //     await CsvModel.deleteCsvFile(fileId);
-
-  //     // // console.log('Deleting file ID:', fileId); // Debug log
-  //     // process.stdout.write(`Deleting file ID: ${fileId}\n`);
-  //     // const wasDeleted = await CsvModel.deleteCsvFile(fileId);
-  //     // // console.log('Was deleted:', wasDeleted); // Debug log
-  //     // process.stdout.write(`Was deleted: ${wasDeleted}\n`);
-        
-  //     // if (!wasDeleted) {
-  //     //     res.status(404).json({ error: 'CSV file not found' });
-  //     //     return;
-  //     // }
-
-  //     res.json({ message: 'CSV file deleted successfully' });
-  //   } catch (err) {
-  //     CsvController.handleServerError(res, 'deleting CSV file', err);
-  //   }
-  // }
 
   static async deleteCsvFile(req: Request, res: Response): Promise<void> {
     try {

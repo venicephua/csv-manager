@@ -19,8 +19,7 @@ describe('CSV API Endpoints', () => {
       col_id: 101,
       col_name: 'John Doe',
       col_email: 'john@example.com',
-      col_body: 'This is a test comment',
-      row_index: 0
+      col_body: 'This is a test comment'
     },
     {
       id: 2,
@@ -29,8 +28,7 @@ describe('CSV API Endpoints', () => {
       col_id: 102,
       col_name: 'Jane Smith',
       col_email: 'jane@example.com',
-      col_body: 'Another test comment',
-      row_index: 1
+      col_body: 'Another test comment'
     }
   ];
 
@@ -192,10 +190,10 @@ describe('CSV API Endpoints', () => {
 
   describe('DELETE /api/csv/files/:fileId', () => {
     it('should delete a specific CSV file', async () => {
-      const response = await request(app).delete(`/api/csv/files/${mockFileId}`);
+      const response1 = await request(app).delete(`/api/csv/files/${mockFileId}`);
       
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response1.status).toBe(200);
+      expect(response1.body).toEqual({
         message: 'CSV file deleted successfully'
       });
     });

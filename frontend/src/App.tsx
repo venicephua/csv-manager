@@ -1,34 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import FileUpload from './components/FileUpload';
+import DataTable from './components/DataTable';
+import { fetchLatestFileId } from './services/api';
+import './App.css';
 
-function App() {
-  // const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [uploadedFileId, setUploadedFileId] = useState<number | null>(null);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  // Fetch the most recent file ID when component mounts
+  useEffect(() => {
+    const loadInitialFile = async () => {
+      try {
+        const latestFileId = await fetchLatestFileId();
+        setUploadedFileId(latestFileId);
+      } catch (error) {
+        console.error("Error loading initial file:", error);
+      } finally {
+        setInitialLoadComplete(true);
+      }
+    };
+
+    loadInitialFile();
+  }, []);
+
+  const handleUploadSuccess = (fileId: number) => {
+    console.log(`File uploaded successfully with ID: ${fileId}`);
+    setUploadedFileId(fileId);
+    setRefreshTrigger(prev => prev + 1); // This forces DataTable to remount
+  };
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        {/* <button onClick={() => setCount((count) => count + 1)}> */}
-          {/* count is {count} */}
-        {/* </button> */}
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className="app">
+      <header className="app-header">
+        <h1>CSV Data Manager</h1>
+      </header>
+      
+      <main>
+        <FileUpload onUploadSuccess={handleUploadSuccess} />
+        {initialLoadComplete && (
+          <DataTable 
+            fileId={uploadedFileId} 
+            key={`${uploadedFileId}-${refreshTrigger}`} // More precise key
+          />
+        )}
+      </main>
+      
+      <footer>
+        <p>CSV Data Processing Application</p>
+      </footer>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
