@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import router from './routes/csvRoutes';
-import { initDb } from './config/db';
 
 process.on('exit', (code) => {
   console.log(`Process exited with code ${code}`);
@@ -11,7 +10,6 @@ process.on('exit', (code) => {
 process.on('beforeExit', (code) => {
   console.log(`Process beforeExit with code ${code}`);
 });
-
 
 const app = express();
 
@@ -32,33 +30,5 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
-
-const PORT = process.env.PORT || 3001;
-
-async function startServer() {
-  try {
-    await initDb();
-    console.log('Database initialized successfully. About to start server...');
-
-    const server = app.listen(PORT, () => {
-      console.log(`✅ Server is now actually listening on port ${PORT}`);
-    });
-
-    // Keep alive explicitly (optional)
-    server.on('close', () => {
-      console.log('Server closed');
-    });
-
-    server.on('error', (err) => {
-      console.error('Server error:', err);
-    });
-
-  } catch (err) {
-    console.error('Failed to initialize database:', err);
-    process.exit(1);
-  }
-}
-
-startServer();
 
 export default app;
