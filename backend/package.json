@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node dist/src/app.js",
+    "start": "node dist/src/server.js",
     "test": "jest --detectOpenHandles"
   },
   "keywords": [],

@@ -6,7 +6,7 @@ dotenv.config();
 // Create a connection pool
 const pool = new Pool({
   user: process.env.DB_USER || 'venice',
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'postgres',
   database: process.env.DB_NAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   port: parseInt(process.env.DB_PORT || '5432'),
