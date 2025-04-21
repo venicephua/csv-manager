@@ -11,6 +11,8 @@ A full-stack application built with TypeScript that allows users to upload CSV f
 - Responsive design
 - Data validation and error handling
 
+> Note: This application currently only accepts CSV files with column headers identical to the sample [data.csv](data.csv).
+
 ## Tech Stack
 | Component       | Technology                        |
 |-----------------|-----------------------------------|
